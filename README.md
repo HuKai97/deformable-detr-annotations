@@ -1,3 +1,14 @@
+# deformable-detr-annnotations
+[源码地址：https://github.com/fundamentalvision/Deformable-DETR](https://github.com/fundamentalvision/Deformable-DETR)
+
+一个deformable-detr的中文注释版本，供大家参考学习！  
+A Chinese annotated version of deformable-detr!
+
+# CSDN源码讲解导航
+
+- [【Deformable DETR 论文+源码解读】Deformable Transformers for End-to-End Object Detection](https://blog.csdn.net/qq_38253797/article/details/127618806)
+
+
 # Deformable DETR
 
 By [Xizhou Zhu](https://scholar.google.com/citations?user=02RXI00AAAAJ),  [Weijie Su](https://www.weijiesu.com/),  [Lewei Lu](https://www.linkedin.com/in/lewei-lu-94015977/), [Bin Li](http://staff.ustc.edu.cn/~binli/), [Xiaogang Wang](http://www.ee.cuhk.edu.hk/~xgwang/), [Jifeng Dai](https://jifengdai.org/).

@@ -83,13 +83,20 @@ class BackboneBase(nn.Module):
         self.body = IntermediateLayerGetter(backbone, return_layers=return_layers)
 
     def forward(self, tensor_list: NestedTensor):
+        # 输入特征图  [bs, C, H, W]  ->  返回ResNet50中 layer2 layer3 layer4层的输出特征图
+        # 0 = [bs, 512, H/8, W/8]  1 = [bs, 1024, H/16, W/16]  2 = [bs, 2048, H/32, W/32]
         xs = self.body(tensor_list.tensors)
         out: Dict[str, NestedTensor] = {}
         for name, x in xs.items():
             m = tensor_list.mask
             assert m is not None
+            # 原图片mask下采样8、16、32倍
             mask = F.interpolate(m[None].float(), size=x.shape[-2:]).to(torch.bool)[0]
             out[name] = NestedTensor(x, mask)
+        # 3个不同尺度的输出特征和mask  dict: 3
+        # 0: tensors[bs, 512, H/8, W/8]  mask[bs, H/8, W/8]
+        # 1: tensors[bs, 1024, H/16, W/16]  mask[bs, H/16, W/16]
+        # 3: tensors[bs, 2048, H/32, W/32]  mask[bs, H/32, W/32]
         return out
 
 
@@ -112,10 +119,11 @@ class Backbone(BackboneBase):
 class Joiner(nn.Sequential):
     def __init__(self, backbone, position_embedding):
         super().__init__(backbone, position_embedding)
-        self.strides = backbone.strides
-        self.num_channels = backbone.num_channels
+        self.strides = backbone.strides   # [8, 16, 32]
+        self.num_channels = backbone.num_channels  # [512, 1024, 2048]
 
     def forward(self, tensor_list: NestedTensor):
+        # tensor_list: 输入图像tensors和mask   经过self[0]backbone输出3个不同尺度的特征tensors和对应大小的mask  dict: 3
         xs = self[0](tensor_list)
         out: List[NestedTensor] = []
         pos = []
@@ -126,6 +134,12 @@ class Joiner(nn.Sequential):
         for x in out:
             pos.append(self[1](x).to(x.tensors.dtype))
 
+        # out: dict: 3  经过backbone输出3个不同尺度的特征tensors和对应大小的mask
+        # 0: tensors[bs, 512, H/8, W/8]  mask[bs, H/8, W/8]
+        # 1: tensors[bs, 1024, H/16, W/16]  mask[bs, H/16, W/16]
+        # 3: tensors[bs, 2048, H/32, W/32]  mask[bs, H/32, W/32]
+        # pos: 3个不同尺度的特征对应的3个位置编码(这里一步到位直接生成经过1x1conv降维后的位置编码)
+        # 0: [bs, 256, H/8, W/8]  1: [bs, 256, H/16, W/16]  2: [bs, 256, H/32, W/32]
         return out, pos
 
 
