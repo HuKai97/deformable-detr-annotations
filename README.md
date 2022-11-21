@@ -6,7 +6,7 @@ A Chinese annotated version of deformable-detr!
 
 # CSDN源码讲解导航
 
-- [【Deformable DETR 论文+源码解读】Deformable Transformers for End-to-End Object Detection](https://blog.csdn.net/qq_38253797/article/details/127618806)
+- [【Deformable DETR 论文+源码解读】Deformable Transformers for End-to-End Object Detection](https://hukai.blog.csdn.net/article/details/127668593)
 
 
 # Deformable DETR
